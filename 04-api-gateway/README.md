@@ -65,7 +65,20 @@ curl -H "Authorization: Bearer <token>" \
      -d '{"question": "what is docker?"}'
 
 # Test rate limit: spam 20 requests liên tiếp
-python test_advanced.py --test rate-limit
+# Lấy token rồi gửi 20 requests — request 11+ sẽ bị chặn (429)
+TOKEN=$(curl -s -X POST http://localhost:8000/auth/token \
+     -H "Content-Type: application/json" \
+     -d '{"username": "student", "password": "demo123"}' \
+     | python3 -c "import sys,json; print(json.load(sys.stdin)['access_token'])")
+
+for i in $(seq 1 20); do
+  printf "Request %2d: " $i
+  curl -s -H "Authorization: Bearer $TOKEN" \
+       -X POST http://localhost:8000/ask \
+       -H "Content-Type: application/json" \
+       -d '{"question": "what is docker?"}' \
+       | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('answer','')[:60] if 'answer' in d else f'❌ {d.get(\"detail\",d)}')"
+done
 ```
 
 ---
