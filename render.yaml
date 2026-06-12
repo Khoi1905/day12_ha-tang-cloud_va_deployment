@@ -7,7 +7,6 @@ services:
     rootDir: 06-lab-complete
     dockerCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1 --timeout-graceful-shutdown 30
     healthCheckPath: /health
-    maxShutdownDelaySeconds: 30
     autoDeployTrigger: commit
     envVars:
       - key: ENVIRONMENT
