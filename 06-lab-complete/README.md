@@ -17,8 +17,10 @@ Vì không có state quan trọng trong memory của agent, stack có thể scal
 ```powershell
 Copy-Item .env.example .env.local
 # Đặt AGENT_API_KEY trong .env.local
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
 docker compose up -d --build --scale agent=3
-python -m pytest tests -v
+.\.venv\Scripts\python.exe -m pytest tests -v
 ```
 
 Service được expose tại `http://localhost:8000`.
@@ -72,5 +74,5 @@ Sau deploy, lấy URL cùng `AGENT_API_KEY` trong Render Dashboard và chạy:
 ```powershell
 $env:BASE_URL = "https://<domain>"
 $env:AGENT_API_KEY = "<production-key>"
-python -m pytest tests -v
+.\.venv\Scripts\python.exe -m pytest tests -v
 ```

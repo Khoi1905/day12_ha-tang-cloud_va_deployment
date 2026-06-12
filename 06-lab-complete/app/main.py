@@ -102,7 +102,8 @@ def ask_agent(body: AskRequest, user_id: str = Depends(verify_api_key)):
     # Reserve input cost before the LLM call, then record output cost afterward.
     monthly_cost = record_cost(user_id, estimate_cost_micro_usd(body.question))
     append_history(session_id, "user", body.question)
-    answer = llm_ask(body.question)
+    history = load_history(session_id)
+    answer = llm_ask(body.question, history=history)
     append_history(session_id, "assistant", answer)
     monthly_cost = record_cost(user_id, estimate_cost_micro_usd(answer, output=True))
     history = load_history(session_id)

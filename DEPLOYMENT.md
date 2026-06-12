@@ -6,7 +6,15 @@ Render Free Blueprint
 
 ## Public URL
 
-Sẽ được cập nhật sau khi kết nối GitHub repository với Render Blueprint.
+https://day12-production-agent.onrender.com
+
+## Public Endpoint Checks
+
+```text
+GET /       -> {"app":"Production AI Agent","version":"2.0.0"}
+GET /health -> {"status":"ok", ...}
+GET /ready  -> {"ready":true, ...}
+```
 
 ## Environment Variables
 
@@ -21,25 +29,39 @@ Sẽ được cập nhật sau khi kết nối GitHub repository với Render Bl
 ```powershell
 $env:BASE_URL = "https://day12-production-agent.onrender.com"
 $env:AGENT_API_KEY = "<production-key>"
-python -m pytest 06-lab-complete/tests -v
+.\06-lab-complete\.venv\Scripts\python.exe -m pytest 06-lab-complete/tests -v
 ```
 
 Secret không được ghi vào tài liệu hoặc commit vào repository.
 
-## Create Blueprint
+### Health Check
 
-1. Push repository lên GitHub.
-2. Mở Render Dashboard, chọn **New > Blueprint**.
-3. Kết nối repository và dùng file `render.yaml` ở repository root.
-4. Nhập một secret ngẫu nhiên cho `AGENT_API_KEY` khi Render yêu cầu.
-5. Kiểm tra cả web service và Key Value instance đều dùng plan `free`.
-6. Chọn **Apply** và đợi deploy thành công.
-7. Mở web service để lấy public URL.
+```powershell
+Invoke-RestMethod https://day12-production-agent.onrender.com/health
+```
 
-Blueprint tự động tạo:
+### Authenticated API Test
+
+```powershell
+$headers = @{
+  "X-API-Key" = "<production-key>"
+  "X-User-ID" = "student-01"
+}
+$body = '{"question":"What is Docker?"}'
+Invoke-RestMethod https://day12-production-agent.onrender.com/ask `
+  -Method Post -Headers $headers -ContentType application/json -Body $body
+```
+
+## Blueprint Resources
 
 ```text
 day12-production-agent  -> Free Docker web service
 day12-agent-cache       -> Free Render Key Value
 REDIS_URL               -> Private connection string
 ```
+
+## Screenshots
+
+- [Deployment dashboard](screenshots/dashboard.png)
+- [Service running](screenshots/running.png)
+- [Cloud test results](screenshots/test.png)

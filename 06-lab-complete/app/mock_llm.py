@@ -1,4 +1,4 @@
-"""Deterministic local LLM substitute used by the deployment lab."""
+"""Deterministic, context-aware local LLM substitute used by the deployment lab."""
 import time
 
 
@@ -9,9 +9,17 @@ RESPONSES = {
 }
 
 
-def ask(question: str, delay: float = 0.05) -> str:
+def ask(question: str, history: list[dict] | None = None, delay: float = 0.05) -> str:
     time.sleep(delay)
     lowered = question.lower()
+    if history and "what did i just say" in lowered:
+        previous_questions = [
+            message["content"]
+            for message in history[:-1]
+            if message.get("role") == "user"
+        ]
+        if previous_questions:
+            return f'You previously said: "{previous_questions[-1]}"'
     for keyword, response in RESPONSES.items():
         if keyword in lowered:
             return response
